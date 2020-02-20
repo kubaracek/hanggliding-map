@@ -1,0 +1,50 @@
+module Bounds exposing
+    ( Bounds
+    , ZoomLevel
+    , zoom
+    )
+
+import LatLng as LatLng exposing (LatLng)
+import Tile exposing (Offset)
+import Utils exposing (wrap)
+
+
+type alias Bounds a =
+    { northEast : a
+    , southWest : a
+    }
+
+
+type alias ZoomLevel =
+    Float
+
+
+latY : Float -> Float
+latY lat =
+    sin (lat * pi / 180)
+
+
+zoom : Float -> Float -> Float -> Bounds LatLng -> ZoomLevel
+zoom tileSize mapWidth mapHeight bounds =
+    let
+        ( ne, sw ) =
+            ( bounds.northEast, bounds.southWest )
+
+        radX2 lat =
+            logBase e ((1 + latY lat) / (1 - latY lat)) / 2
+
+        latRad lat =
+            (max -pi <| min (radX2 lat) pi) / 2
+
+        latFraction =
+            latRad ne.lat - latRad sw.lat
+
+        lngFraction =
+            ((ne.lng - sw.lng) |> wrap 0 360) / 360
+
+        zoomFn mapSize tileSize2 frac =
+            logBase 2 (mapSize / tileSize2 / frac)
+    in
+    min
+        (zoomFn mapWidth tileSize lngFraction)
+        (zoomFn mapHeight tileSize latFraction)
