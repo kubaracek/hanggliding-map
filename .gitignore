@@ -5,3 +5,6 @@ repl-temp-*
 
 #Npm nononono
 node_modules
+
+#Can be generated
+public/app.js
