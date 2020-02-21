@@ -1,7 +1,7 @@
 module Projection exposing (boundsPixelOffset)
 
 import Bounds exposing (Bounds, ZoomLevel)
-import LatLng exposing (LatLng)
+import LatLng exposing (LatLng, getLng, getLat)
 import Tile exposing (Offset)
 import Utils exposing (flip)
 
@@ -15,13 +15,13 @@ originShift =
 
 
 latLngMeters : LatLng -> Offset
-latLngMeters { lat, lng } =
+latLngMeters latlng =
     let
         mx =
-            lng * originShift / 180.0
+            getLng latlng * originShift / 180.0
 
         my_ =
-            tan ((90 + lat) * pi / 360.0) |> logBase e |> flip (/) (pi / 180.0)
+            tan ((90 + getLat latlng) * pi / 360.0) |> logBase e |> flip (/) (pi / 180.0)
 
         my =
             my_ * originShift / 180.0
