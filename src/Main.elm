@@ -1,51 +1,66 @@
 module Main exposing (..)
 
 import Browser
+import Browser.Events exposing (onAnimationFrameDelta)
+import Canvas exposing (rect, shapes)
+import Canvas.Settings exposing (fill)
+import Canvas.Settings.Advanced exposing (rotate, transform, translate)
+import Canvas.Texture as Texture exposing (Texture)
+import Color
 import Html exposing (Html, button, div, text)
-import Html.Attributes as Attr
+import Html.Attributes as Attr exposing (style)
 import Html.Events exposing (onClick)
 import Map
 import Tile
 
 
+type Load a
+    = Loading
+    | Success a
+    | Failure
+
+
 type alias Model =
-    Map.Map
+    {
+    map : Map.Map
+    , textures : List (Load TileData)
+    }
+
+
+type alias TileData =
+    { offset : Tile.Offset
+    , texture : Texture
+    }
 
 
 initialModel : Model
 initialModel =
-    Map.initialModel
+    {map = Map.initialModel, textures = [] }
 
 
-type Msg
-    = Increment
-    | Decrement
+type Msg =
+    TextureLoaded Tile.Offset (Maybe Texture)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            ( model, Cmd.none )
+        TextureLoaded _ Nothing ->
+            Debug.log "not loaded" <|
+            ( { model | textures = Failure :: model.textures }
+            , Cmd.none
+            )
 
-        Decrement ->
-            ( model, Cmd.none )
-
-
-view : Model -> Browser.Document Msg
-view model =
-    { title = "Hanglider Map"
-    , body =
-        [ div
-            [ Attr.style "width" <| String.fromInt model.width ++ "px"
-            , Attr.style "height" <| String.fromInt model.height ++ "px"
-            , Attr.style "background-color" "red"
-            ]
-          <|
-            List.map (\(( url, offset ) as tile) -> Tile.view (toFloat model.tileSize) tile) <|
-                Map.tiles model
-        ]
-    }
+        TextureLoaded offset (Just texture) ->
+            Debug.log "loaded" <|
+            ( { model
+                | textures =
+                    Success
+                        { offset = offset, texture = texture }
+                        :: model.textures
+              }
+            , Cmd.none
+            )
 
 
 type alias Flags =
@@ -70,3 +85,46 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+view : Model -> Browser.Document Msg
+view model =
+    { title = "Hanggliding Map"
+    , body =
+        [ -- div
+          --   [ Attr.style "width" <| String.fromInt model.map.width ++ "px"
+          --   , Attr.style "height" <| String.fromInt model.map.height ++ "px"
+          --   , Attr.style "background-color" "red"
+          --   ]
+          -- <|
+          --   List.map (\(( url, offset ) as tile) -> Tile.view (toFloat model.map.tileSize) tile) <|
+          --       Map.tiles model.map
+        viewCanvas model
+        ]
+    }
+
+
+viewCanvas : Model -> Html Msg
+viewCanvas model =
+  let
+    clear = shapes [ fill Color.white ] [ rect (0, 0) (toFloat model.map.width) (toFloat model.map.height) ]
+
+    load (url, offset) =
+      Texture.loadFromImageUrl url (TextureLoaded offset)
+
+    renderTile tex =
+        case tex of
+            Loading ->
+                Canvas.text [] (0,0) "Loading"
+            Success tt ->
+                Canvas.texture [] (tt.offset.x, tt.offset.y) tt.texture
+            Failure ->
+                Canvas.text [] (0,0) "Error"
+
+    options =
+      { width = model.map.width
+      , height = model.map.height
+      , textures = List.map load <| Map.tiles model.map
+      }
+  in
+    Canvas.toHtmlWith options [] (clear :: (List.map renderTile model.textures))
