@@ -4,7 +4,7 @@ module Bounds exposing
     , zoom
     )
 
-import LatLng as LatLng exposing (LatLng)
+import LatLng as LatLng exposing (LatLng, getLat, getLng, latLng)
 import Tile exposing (Offset)
 import Utils exposing (wrap)
 
@@ -37,10 +37,10 @@ zoom tileSize mapWidth mapHeight bounds =
             (max -pi <| min (radX2 lat) pi) / 2
 
         latFraction =
-            latRad ne.lat - latRad sw.lat
+            latRad (getLat ne) - latRad (getLat sw)
 
         lngFraction =
-            ((ne.lng - sw.lng) |> wrap 0 360) / 360
+            ((getLng ne - getLng sw) |> wrap 0 360) / 360
 
         zoomFn mapSize tileSize2 frac =
             logBase 2 (mapSize / tileSize2 / frac)
@@ -48,3 +48,11 @@ zoom tileSize mapWidth mapHeight bounds =
     min
         (zoomFn mapWidth tileSize lngFraction)
         (zoomFn mapHeight tileSize latFraction)
+
+
+findCenter : Bounds LatLng -> LatLng
+findCenter bounds =
+    latLng
+        { lat = getLat bounds.northEast - getLat bounds.southWest / 2
+        , lng = getLng bounds.northEast - getLng bounds.southWest / 2
+        }
