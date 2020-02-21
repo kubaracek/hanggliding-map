@@ -65,3 +65,16 @@ formatInt userRegex number str =
                     Regex.replace regex replacer string
     in
     userReplace userRegex (\_ -> String.fromInt number) str
+
+view : Float -> Tile -> Html msg
+view tileSize (tileUrl, offset) =
+  Html.img
+    [ Attr.src tileUrl
+    , Attr.style "position" "absolute"
+    , Attr.style "left" <| String.fromFloat offset.x ++ "px"
+    , Attr.style "top" <| String.fromFloat offset.y ++ "px"
+    , Attr.style "width" <| String.fromFloat tileSize ++ "px"
+    , Attr.style "height" <| String.fromFloat tileSize ++ "px"
+    , Attr.style "background-color" <| "rgba(0,0,0, 0)"
+    ]
+    []
