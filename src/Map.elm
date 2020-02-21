@@ -21,8 +21,8 @@ initialModel =
         { northEast = latLng { lat = 48.888762, lng = 17.167253 }
         , southWest = latLng { lat = 48.823593, lng = 17.07593 }
         }
-    , width = 512
-    , height = 512
+    , width = 2024
+    , height = 2024
     , tileSize = 256
     }
 
