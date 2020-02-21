@@ -2,6 +2,7 @@ module Bounds exposing
     ( Bounds
     , Zoom
     , zoom
+    , findCenter
     )
 
 import LatLng as LatLng exposing (LatLng, getLat, getLng, latLng)
