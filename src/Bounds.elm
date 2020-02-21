@@ -52,6 +52,6 @@ zoom tileSize mapWidth mapHeight bounds =
 findCenter : Bounds LatLng -> LatLng
 findCenter bounds =
     latLng
-        { lat = getLat bounds.northEast - getLat bounds.southWest / 2
-        , lng = getLng bounds.northEast - getLng bounds.southWest / 2
+        { lat = (getLat bounds.northEast + getLat bounds.southWest) / 2
+        , lng = (getLng bounds.northEast + getLng bounds.southWest) / 2
         }
