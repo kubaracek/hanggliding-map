@@ -1,7 +1,7 @@
 module Projection exposing (boundsPixelOffset)
 
 import Bounds exposing (Bounds, Zoom)
-import LatLng exposing (LatLng, getLng, getLat)
+import LatLng exposing (LatLng, getLat, getLng)
 import Tile exposing (Offset)
 import Utils exposing (flip)
 
@@ -27,6 +27,7 @@ latLngMeters latlng =
             my_ * originShift / 180.0
     in
     { x = mx, y = my }
+
 
 metersPixels : Float -> Zoom -> Offset -> Offset
 metersPixels tileSize zoom { x, y } =

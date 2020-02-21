@@ -1,8 +1,8 @@
 module Bounds exposing
     ( Bounds
     , Zoom
-    , zoom
     , findCenter
+    , zoom
     )
 
 import LatLng as LatLng exposing (LatLng, getLat, getLng, latLng)
@@ -20,14 +20,12 @@ type alias Zoom =
     Float
 
 
-latY : Float -> Float
-latY lat =
-    sin (lat * pi / 180)
-
-
 zoom : Float -> Float -> Float -> Bounds LatLng -> Zoom
 zoom tileSize mapWidth mapHeight bounds =
     let
+        latY lat =
+            sin (lat * pi / 180)
+
         ( ne, sw ) =
             ( bounds.northEast, bounds.southWest )
 

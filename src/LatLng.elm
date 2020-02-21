@@ -11,6 +11,7 @@ type LatLng
         , lng : GPS
         }
 
+
 type GPS
     = GPS Float Float
 
