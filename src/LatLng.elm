@@ -43,28 +43,28 @@ decGps gps =
 
 
 fromGps : { lat : GPS, lng : GPS } -> LatLng
-fromGps { lat, lng } =
+fromGps latlng =
     LatLng
-        { lat = decGps lat
-        , lng = decGps lng
+        { lat = decGps latlng.lat
+        , lng = decGps latlng.lng
         }
 
 
 getLat : LatLng -> Float
 getLat latlng =
     case latlng of
-        LatLng { lat, lng } ->
-            lat
+        LatLng l ->
+            l.lat
 
-        Gps { lat, lng } ->
-            decGps lat
+        Gps l ->
+            decGps l.lat
 
 
 getLng : LatLng -> Float
 getLng latlng =
     case latlng of
-        LatLng { lat, lng } ->
-            lng
+        LatLng l ->
+            l.lng
 
-        Gps { lat, lng } ->
-            decGps lng
+        Gps l ->
+            decGps l.lng
