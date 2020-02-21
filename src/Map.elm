@@ -14,18 +14,18 @@ type alias Map =
     , tileSize : Int
     }
 
-{-| Test:
-map =
-{ server = "<http://c.tile.stamen.com/watercolor/${z}/${x}/${y}.jpg">
-, bounds =
-{ northEast = latLng { lat=48.874538, lng=17.134638 }
-, southWest = latLng { lat=48.839470, lng=17.113760 }
-}
-, width = 1024
-, height = 1024
-, tileSize = 256
-}
--}
+
+initialModel =
+    { server = "https://api.maptiler.com/maps/topo/256/{z}/{x}/{y}.png?key=uOnJe75yrTX7TmDr3V5B"
+    , bounds =
+        { northEast = latLng { lat = 48.888762, lng = 17.167253 }
+        , southWest = latLng { lat = 48.823593, lng = 17.075930 }
+        }
+    , width = 512
+    , height = 512
+    , tileSize = 256
+    }
+
 tiles : Map -> List Tile
 tiles map =
     let

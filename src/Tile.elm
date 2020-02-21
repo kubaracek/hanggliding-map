@@ -3,13 +3,14 @@ module Tile exposing
     , Tile
     , fromLatLng
     , url
+    , view
     )
 
 import Html exposing (Html)
 import Html.Attributes as Attr
 import LatLng as LatLng exposing (LatLng, getLat, getLng)
 import Regex exposing (replace)
-import Utils exposing (wrap)
+import Utils exposing (wrap, uncurry)
 
 
 type alias Url =
@@ -32,7 +33,6 @@ url tileServer zoom x y =
         |> formatInt "{z}" zoom
         |> formatInt "{x}" x
         |> formatInt "{y}" y
-
 
 fromLatLng : Float -> LatLng -> Offset
 fromLatLng zoom loc =
