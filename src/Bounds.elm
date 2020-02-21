@@ -1,6 +1,6 @@
 module Bounds exposing
     ( Bounds
-    , ZoomLevel
+    , Zoom
     , zoom
     )
 
@@ -15,7 +15,7 @@ type alias Bounds a =
     }
 
 
-type alias ZoomLevel =
+type alias Zoom =
     Float
 
 
@@ -24,7 +24,7 @@ latY lat =
     sin (lat * pi / 180)
 
 
-zoom : Float -> Float -> Float -> Bounds LatLng -> ZoomLevel
+zoom : Float -> Float -> Float -> Bounds LatLng -> Zoom
 zoom tileSize mapWidth mapHeight bounds =
     let
         ( ne, sw ) =

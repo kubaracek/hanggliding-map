@@ -1,6 +1,6 @@
 module Projection exposing (boundsPixelOffset)
 
-import Bounds exposing (Bounds, ZoomLevel)
+import Bounds exposing (Bounds, Zoom)
 import LatLng exposing (LatLng, getLng, getLat)
 import Tile exposing (Offset)
 import Utils exposing (flip)
@@ -28,8 +28,7 @@ latLngMeters latlng =
     in
     { x = mx, y = my }
 
-
-metersPixels : Float -> ZoomLevel -> Offset -> Offset
+metersPixels : Float -> Zoom -> Offset -> Offset
 metersPixels tileSize zoom { x, y } =
     let
         res =
@@ -55,6 +54,6 @@ boundsPixelOffset tileSize zoom { northEast, southWest } =
     }
 
 
-resolution : Float -> ZoomLevel -> Float
+resolution : Float -> Zoom -> Float
 resolution tileSize zoom =
     initialResolution tileSize / (2 ^ zoom)
