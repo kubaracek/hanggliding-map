@@ -70,8 +70,9 @@ tiles map =
 
 setHeight : Int -> Map -> Map
 setHeight res map =
-     { map | height = res }
+    { map | height = res }
+
 
 setWidth : Int -> Map -> Map
 setWidth res map =
-     { map | width = res }
+    { map | width = res }
