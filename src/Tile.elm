@@ -7,7 +7,7 @@ module Tile exposing
 
 import Html exposing (Html)
 import Html.Attributes as Attr
-import LatLng as LatLng exposing (LatLng)
+import LatLng as LatLng exposing (LatLng, getLat, getLng)
 import Regex exposing (replace)
 import Utils exposing (wrap)
 
@@ -41,10 +41,10 @@ fromLatLng zoom loc =
             2 ^ zoom
 
         x =
-            n * ((loc.lng + 180) / 360) |> wrap 0 n
+            n * ((getLng loc + 180) / 360) |> wrap 0 n
 
         latRad =
-            loc.lat * pi / 180
+            getLat loc * pi / 180
 
         y =
             n * (1 - (logBase e <| abs <| tan latRad + (1 / cos latRad)) / pi) / 2

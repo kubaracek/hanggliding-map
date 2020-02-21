@@ -1,4 +1,4 @@
-module LatLng exposing (GPS, LatLng, fromGps, latLng)
+module LatLng exposing (GPS, LatLng, fromGps, latLng, getLat, getLng)
 
 
 type LatLng
