@@ -66,3 +66,12 @@ tiles map =
             )
     in
     List.concat <| cartesianMap tileXY xTiles yTiles
+
+
+setHeight : Int -> Map -> Map
+setHeight res map =
+     { map | height = res }
+
+setWidth : Int -> Map -> Map
+setWidth res map =
+     { map | width = res }
