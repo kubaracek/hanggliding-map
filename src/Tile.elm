@@ -10,7 +10,7 @@ import Html exposing (Html)
 import Html.Attributes as Attr
 import LatLng as LatLng exposing (LatLng, getLat, getLng)
 import Regex exposing (replace)
-import Utils exposing (wrap, uncurry)
+import Utils exposing (uncurry, wrap)
 
 
 type alias Url =
@@ -33,6 +33,7 @@ url tileServer zoom x y =
         |> formatInt "{z}" zoom
         |> formatInt "{x}" x
         |> formatInt "{y}" y
+
 
 fromLatLng : Float -> LatLng -> Offset
 fromLatLng zoom loc =
@@ -66,15 +67,16 @@ formatInt userRegex number str =
     in
     userReplace userRegex (\_ -> String.fromInt number) str
 
+
 view : Float -> Tile -> Html msg
-view tileSize (tileUrl, offset) =
-  Html.img
-    [ Attr.src tileUrl
-    , Attr.style "position" "absolute"
-    , Attr.style "left" <| String.fromFloat offset.x ++ "px"
-    , Attr.style "top" <| String.fromFloat offset.y ++ "px"
-    , Attr.style "width" <| String.fromFloat tileSize ++ "px"
-    , Attr.style "height" <| String.fromFloat tileSize ++ "px"
-    , Attr.style "background-color" <| "rgba(0,0,0, 0)"
-    ]
-    []
+view tileSize ( tileUrl, offset ) =
+    Html.img
+        [ Attr.src tileUrl
+        , Attr.style "position" "absolute"
+        , Attr.style "left" <| String.fromFloat offset.x ++ "px"
+        , Attr.style "top" <| String.fromFloat offset.y ++ "px"
+        , Attr.style "width" <| String.fromFloat tileSize ++ "px"
+        , Attr.style "height" <| String.fromFloat tileSize ++ "px"
+        , Attr.style "background-color" <| "rgba(0,0,0, 0)"
+        ]
+        []
