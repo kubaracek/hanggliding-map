@@ -113,8 +113,8 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Hanggliding Map"
     , body =
-        [ viewCanvas "" ImageMap model.imageMap
-        , viewCanvas "" HeightMap model.heightMap
+        [ viewCanvas "imageMap" ImageMap model.imageMap
+        , viewCanvas "heightMap" HeightMap model.heightMap
         ]
     }
 
