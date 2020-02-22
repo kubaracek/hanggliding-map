@@ -8,8 +8,9 @@
   <link rel="icon" type="image/png" href="images/favicon.png" />
 </head>
 <body>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
   <script src="https://unpkg.com/elm-debug-transformer@1.0.1/dist/elm-console-debug.js"></script>
-    <script src="https://unpkg.com/elm-canvas@2.2/elm-canvas.js"></script>
+  <script src="https://unpkg.com/elm-canvas@2.2/elm-canvas.js"></script>
   <script src="app.js"></script>
   <script>
     ElmConsoleDebug.register({simple_mode: true})
@@ -18,6 +19,99 @@
       flags: {
       }
     });
+  </script>
+
+  <canvas id="renderCanvas" width="1024" height="1024"></canvas>
+  <script type="text/javascript">
+    // setTimeout(function() {
+    //    var heightMap = document.getElementById("heightMap").childNodes.item("canvas");
+
+    //     var unpackTerrarium = function(r, g, b) {
+    //         return (r * 256 + g + b / 256) - 32768;
+    //     }
+
+    //     var decodeData = function(canvas) {
+    //       var ctx = canvas.getContext('2d');
+    //       var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    //       var data = imageData.data;
+    //       for (var i = 0; i < data.length; i += 4) {
+
+    //         let lightness = unpackTerrarium(data[i] + data[i + 1] + data[i + 2]);
+
+    //         data[i] = 1;
+    //         data[i + 1] = 1;
+    //         data[i + 2] = 1;
+    //       }
+
+    //       ctx.putImageData(imageData, 0, 0)
+    //     }
+    //     decodeData(heightMap)
+    // }, 2000);
+
+
+    
+    //   var canvas = document.getElementById("renderCanvas");
+    //   var engine = new BABYLON.Engine(canvas, true);
+    //   var createScene  = function() {
+    //     var scene = new BABYLON.Scene(engine);
+    //     // Light
+    //     var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 30, 10), scene);
+    //     spot.diffuse = new BABYLON.Color3(1, 1, 1);
+    //     spot.specular = new BABYLON.Color3(0, 0, 0);
+
+    //     // Camera
+    //     var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0.8, 100, BABYLON.Vector3.Zero(), scene);
+    //     camera.lowerBetaLimit = 0.1;
+    //     camera.upperBetaLimit = (Math.PI / 2) * 0.9;
+    //     camera.lowerRadiusLimit = 30;
+    //     camera.upperRadiusLimit = 150;
+    //     camera.attachControl(canvas, true);
+
+
+    //     var imageMapUrl = document.getElementById("imageMap").childNodes.item("canvas").toDataURL();
+    //     var heightMap = document.getElementById("heightMap").childNodes.item("canvas");
+    //     document.getElementById("heightMap").childNodes.item("canvas").getContext('2d').clearRect(0, 0, 1024, 1024);
+      
+    //     var unpackTerrarium = function(r, g, b) {
+    //         return (r * 256 + g + b / 256) - 32768;
+    //     }
+
+
+    //     var decodeData = function(canvas) {
+    //       var ctx = canvas.getContext('2d');
+    //       ctx.clearRect(0, 0, 1024, 1024);
+    //       var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    //       var data = imageData.data;
+    //       for (var i = 0; i < data.length; i += 4) {
+ 
+    //         let lightness = unpackTerrarium(data[i] + data[i + 1] + data[i + 2]);
+    
+    //         data[i] = 1; 
+    //         data[i + 1] = 1; 
+    //         data[i + 2] = 1; 
+    //       }
+
+    //       ctx.putImageData(imageData, 0, 0)
+    //     }
+    //     decodeData(heightMap)
+
+    //     // Ground
+    //     var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
+    //     groundMaterial.diffuseTexture = new BABYLON.Texture(imageMapUrl, scene);
+
+
+    //     var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", heightMap.toDataURL(), 200, 200, 250, 0, 10, scene, false);
+    //     ground.material = groundMaterial;		
+    //     return scene;
+    //   };
+      
+    // setTimeout(function() {
+    //   var scene = createScene();
+    //   engine.runRenderLoop(function() {
+    //     scene.render();
+    //   });
+    // }, 2000)
+      
   </script>
 </body>
 </html>
