@@ -14,15 +14,25 @@ type alias Map =
     , tileSize : Int
     }
 
+exampleHeightMap =
+    { server = "https://s3.amazonaws.com/elevation-tiles-prod/normal/{z}/{x}/{y}.png"
+    , bounds =
+        { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
+        , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
+        }
+    , width = 1024
+    , height = 1024
+    , tileSize = 256
+    }
 
-initialModel =
+exampleTexturedMap =
     { server = "https://api.maptiler.com/maps/topo/256/{z}/{x}/{y}.png?key=uOnJe75yrTX7TmDr3V5B"
     , bounds =
-        { northEast = latLng { lat = 48.888762, lng = 17.167253 }
-        , southWest = latLng { lat = 48.823593, lng = 17.07593 }
+        { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
+        , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
         }
-    , width = 2024
-    , height = 2024
+    , width = 1024
+    , height = 1024
     , tileSize = 256
     }
 

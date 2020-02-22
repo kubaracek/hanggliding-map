@@ -19,8 +19,13 @@ type Load a
     | Success a
     | Failure
 
-
 type alias Model =
+    {
+        heightMap : TexturedMap
+      , imageMap : TexturedMap
+    }
+
+type alias TexturedMap =
     { map : Map.Map
     , textures : List (Load TileData)
     }
@@ -34,28 +39,48 @@ type alias TileData =
 
 initialModel : Model
 initialModel =
-    { map = Map.initialModel, textures = [] }
+    {
+        heightMap = { map = Map.exampleHeightMap
+                   , textures = []
+                    }
+       , imageMap = { map = Map.exampleTexturedMap
+                    , textures = []
+                    }
+    }
 
+type MapType =
+    HeightMap
+  | ImageMap
 
 type Msg
-    = TextureLoaded Tile.Offset (Maybe Texture)
+    = TextureLoaded MapType Tile.Offset (Maybe Texture)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        asHeightMapIn a b = { a | heightMap = b }
+        asImageMapIn a b = { a | imageMap = b }
+        asTexturesIn a b = { a | textures = b }
+        updateTexture texture maptype =
+            case maptype of
+                HeightMap ->
+                    texture :: model.heightMap.textures
+                        |> asTexturesIn model.heightMap
+                        |> asHeightMapIn model
+                ImageMap ->
+                    texture :: model.imageMap.textures
+                        |> asTexturesIn model.imageMap
+                        |> asImageMapIn model
+    in
     case msg of
-        TextureLoaded _ Nothing ->
-            ( { model | textures = Failure :: model.textures }
+        TextureLoaded maptype _ Nothing ->
+            ( updateTexture Failure maptype
             , Cmd.none
             )
 
-        TextureLoaded offset (Just texture) ->
-            ( { model
-                | textures =
-                    Success
-                        { offset = offset, texture = texture }
-                        :: model.textures
-              }
+        TextureLoaded maptype offset (Just texture) ->
+            ( updateTexture (Success { offset = offset, texture = texture }) maptype
             , Cmd.none
             )
 
@@ -88,19 +113,20 @@ view : Model -> Browser.Document Msg
 view model =
     { title = "Hanggliding Map"
     , body =
-        [ viewCanvas model
+        [ viewCanvas "" ImageMap model.imageMap
+        , viewCanvas "" HeightMap model.heightMap
         ]
     }
 
 
-viewCanvas : Model -> Html Msg
-viewCanvas model =
+viewCanvas : String -> MapType -> TexturedMap -> Html Msg
+viewCanvas id maptype model =
     let
         clear =
             shapes [ fill Color.white ] [ rect ( 0, 0 ) (toFloat model.map.width) (toFloat model.map.height) ]
 
         load ( url, offset ) =
-            Texture.loadFromImageUrl url (TextureLoaded offset)
+            Texture.loadFromImageUrl url (TextureLoaded maptype offset)
 
         renderTile tex =
             case tex of
@@ -119,4 +145,4 @@ viewCanvas model =
             , textures = List.map load <| Map.tiles model.map
             }
     in
-    Canvas.toHtmlWith options [] (clear :: List.map renderTile model.textures)
+    Canvas.toHtmlWith options [Attr.id id] (clear :: List.map renderTile model.textures)
