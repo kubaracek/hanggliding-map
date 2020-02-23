@@ -117,7 +117,7 @@ view model =
     { title = "Hanggliding Map"
     , body =
         [ viewCanvas "imageMap" ImageMap model.imageMap
-        -- , viewCanvas "heightMap" HeightMap model.heightMap
+        , viewCanvas "heightMap" HeightMap model.heightMap
         , text <| Maybe.withDefault "Unknown" (Maybe.map String.fromFloat <| List.minimum (List.map (\ t -> t.offset.x) <| Map.tiles model.imageMap.map))
         ]
     }
@@ -141,8 +141,8 @@ viewCanvas id maptype model =
                 Success tt ->
                     let
                         latlng t = pixelToLatLng model.map.tileSize (Map.zoom model.map) <|
-                                 { x = (toFloat t.coordinates.x * toFloat model.map.tileSize) - offset.x
-                                 , y = (toFloat t.coordinates.y * toFloat model.map.tileSize) - offset.y
+                                 { x = ((toFloat t.coordinates.x) * toFloat model.map.tileSize) + offset.x
+                                 , y = ((toFloat t.coordinates.y) * toFloat model.map.tileSize) + offset.y
                                  }
                         calibrationText t = "Lat: " ++ (String.fromFloat <| getLat <| latlng t) ++  ", Lng: " ++ (String.fromFloat <| getLng <| latlng t)
                         offset = tt.tile.offset
@@ -174,7 +174,7 @@ viewCanvas id maptype model =
     Canvas.toHtmlWith options
         [ Attr.id id
         , Attr.hidden False
-        , Attr.style "position" "absolute"
+        -- , Attr.style "position" "absolute"
         , Attr.style "opacity" "1"
         , Attr.style "background-color" "red"
         ] (clear :: List.concatMap renderTile model.textures)
