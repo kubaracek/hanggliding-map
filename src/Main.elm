@@ -116,7 +116,7 @@ view model =
     , body =
         [ viewCanvas "imageMap" ImageMap model.imageMap
         , viewCanvas "heightMap" HeightMap model.heightMap
-        , text <| Maybe.withDefault "Unknown" (Maybe.map String.fromFloat <| List.minimum (List.map (\ (_, t) -> t.x) <| Map.tiles model.imageMap.map))
+        , text <| Maybe.withDefault "Unknown" (Maybe.map String.fromFloat <| List.minimum (List.map (\ t -> t.offset.x) <| Map.tiles model.imageMap.map))
         ]
     }
 
@@ -127,8 +127,8 @@ viewCanvas id maptype model =
         clear =
             shapes [ fill Color.white ] [ rect ( 0, 0 ) (toFloat model.map.width) (toFloat model.map.height) ]
 
-        load ( url, offset ) =
-            Texture.loadFromImageUrl url (TextureLoaded (toFloat model.map.tileSize)  maptype offset)
+        load tile =
+            Texture.loadFromImageUrl tile.url (TextureLoaded (toFloat model.map.tileSize)  maptype tile.offset)
 
         renderTile tex =
             case tex of

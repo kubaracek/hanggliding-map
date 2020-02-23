@@ -14,6 +14,7 @@ type alias Map =
     , tileSize : Int
     }
 
+
 exampleHeightMap =
     { server = "https://tile.nextzen.org/tilezen/terrain/v1/256/normal/{z}/{x}/{y}.png?api_key=XJJmLW0zTjKgdFUvWgLV7Q"
     , bounds =
@@ -25,6 +26,7 @@ exampleHeightMap =
     , height = 1024
     , tileSize = 256
     }
+
 
 exampleTexturedMap =
     { server = "https://api.maptiler.com/maps/topo/256/{z}/{x}/{y}.png?key=uOnJe75yrTX7TmDr3V5B"
@@ -38,12 +40,15 @@ exampleTexturedMap =
     , tileSize = 256
     }
 
+
 scaleFactor : Map -> Float
 scaleFactor map =
     let
-        zoom = Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
+        zoom =
+            Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
     in
-        1 + zoom - (toFloat <| floor zoom)
+    1 + zoom - (toFloat <| floor zoom)
+
 
 tiles : Map -> List Tile
 tiles map =
@@ -72,18 +77,28 @@ tiles map =
         wrapTile =
             wrap 0 (2 ^ ceiling zoom)
 
+        tileCoords t x y =
+            { x = floor t.x + x |> wrapTile
+            , y = floor t.y + y |> wrapTile
+            }
+
         tileXY x y =
-            ( Tile.url
-                map.server
-                (ceiling zoom)
-                (floor tile.x + x |> wrapTile)
-                (floor tile.y + y |> wrapTile)
-            , Tile.Offset
-                (toFloat map.width / 2 + (toFloat (floor tile.x) - tile.x + toFloat x) * toFloat map.tileSize)
-                (toFloat map.height / 2 + (toFloat (floor tile.y) - tile.y + toFloat y) * toFloat map.tileSize)
-            )
+            { url =
+                Tile.url
+                    map.server
+                    (ceiling zoom)
+                    (tileCoords tile x y).x
+                    (tileCoords tile x y).y
+            , offset =
+                Tile.Offset
+                    (toFloat map.width / 2 + (toFloat (floor tile.x) - tile.x + toFloat x) * toFloat map.tileSize)
+                    (toFloat map.height / 2 + (toFloat (floor tile.y) - tile.y + toFloat y) * toFloat map.tileSize)
+            , coordinates = tileCoords tile x y
+            , size = map.tileSize
+            }
     in
     List.concat <| cartesianMap tileXY xTiles yTiles
+
 
 setHeight : Int -> Map -> Map
 setHeight res map =

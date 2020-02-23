@@ -2,9 +2,9 @@ module Projection exposing (..)
 
 import Bounds exposing (Bounds, Zoom)
 import LatLng exposing (LatLng, getLat, getLng, latLng)
+import Map
 import Tile exposing (Offset)
 import Utils exposing (flip)
-import Map
 
 
 initialResolution tileSize =
@@ -27,27 +27,71 @@ latLngMeters latlng =
         my =
             my_ * originShift / 180.0
     in
-        { x = mx, y = my }
+    { x = mx, y = my }
+
 
 unproject : Int -> Zoom -> Offset -> LatLng
-unproject tileSize zoom {x, y} =
+unproject tileSize zoom { x, y } =
     let
         -- https://observablehq.com/@kjerandp/unprojecting-map-tile-coordinates
-        r = 6378137
-        d = 180 / pi
-        s = 0.5 / (pi * r)
-        scale = toFloat tileSize * (2 ^ zoom)
-        py = (x / scale - 0.5) / s
-        px = (y / scale - 0.5) / -s
+        r =
+            6378137
+
+        d =
+            180 / pi
+
+        s =
+            0.5 / (pi * r)
+
+        scale =
+            toFloat tileSize * (2 ^ zoom)
+
+        py =
+            (y / scale - 0.5) / s
+
+        px =
+            (x / scale - 0.5) / -s
     in
-        latLng
-          { lat = (2 * atan(e ^ (py / r)) - (pi / 2)) * d
-          , lng = px * d / r
-          }
+    latLng
+        { lat = (2 * atan (e ^ (py / r)) - (pi / 2)) * d
+        , lng = px * d / r
+        }
+
+
+pixelToWorld : Zoom -> Offset -> Offset
+pixelToWorld zoom { x, y } =
+    let
+        pToW p =
+            p / (2 ^ zoom)
+    in
+    { x = pToW x, y = pToW y }
+
+
+tileToLatLng : Offset -> Zoom -> LatLng
+tileToLatLng { x, y } zoom =
+    let
+        sinh f =
+            (e ^ f - e ^ -f) / 2
+
+        n =
+            2.0 ^ zoom
+
+        lon_deg =
+            x / n * 360.0 - 180.0
+
+        lat_rad =
+            atan (sinh (pi * (1 - 2 * y / n)))
+
+        lat_deg =
+            180 * (lat_rad / pi)
+    in
+    latLng { lat = lat_deg, lng = lon_deg }
+
 
 pixelToLatLng : Int -> Float -> Offset -> LatLng
-pixelToLatLng tileSize zoom {x, y} =
-  unproject tileSize zoom {x = (x * toFloat tileSize), y = (y * toFloat tileSize)}
+pixelToLatLng tileSize zoom { x, y } =
+    unproject tileSize zoom { x = x * toFloat tileSize, y = y * toFloat tileSize }
+
 
 metersPixels : Float -> Zoom -> Offset -> Offset
 metersPixels tileSize zoom { x, y } =

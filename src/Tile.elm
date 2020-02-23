@@ -18,7 +18,14 @@ type alias Url =
 
 
 type alias Tile =
-    ( Url, Offset )
+    { url : Url
+    , offset : Offset
+    , size : Int
+    , coordinates :
+        { x : Int
+        , y : Int
+        }
+    }
 
 
 type alias Offset =
@@ -69,12 +76,12 @@ formatInt userRegex number str =
 
 
 view : Float -> Tile -> Html msg
-view tileSize ( tileUrl, offset ) =
+view tileSize tile =
     Html.img
-        [ Attr.src tileUrl
+        [ Attr.src tile.url
         , Attr.style "position" "absolute"
-        , Attr.style "left" <| String.fromFloat offset.x ++ "px"
-        , Attr.style "top" <| String.fromFloat offset.y ++ "px"
+        , Attr.style "left" <| String.fromFloat tile.offset.x ++ "px"
+        , Attr.style "top" <| String.fromFloat tile.offset.y ++ "px"
         , Attr.style "width" <| String.fromFloat tileSize ++ "px"
         , Attr.style "height" <| String.fromFloat tileSize ++ "px"
         , Attr.style "background-color" <| "rgba(0,0,0, 0)"
