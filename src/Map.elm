@@ -44,18 +44,20 @@ exampleTexturedMap =
 scaleFactor : Map -> Float
 scaleFactor map =
     let
-        zoom =
-            Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
+        z = zoom map
     in
-    1 + zoom - (toFloat <| floor zoom)
+        1 + z - (toFloat <| floor z)
+
+
+zoom : Map -> Zoom
+zoom map =
+    Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
 
 
 tiles : Map -> List Tile
 tiles map =
     let
-        zoom =
-            Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
-
+        z = zoom map
         center =
             Bounds.findCenter map.bounds
 
@@ -66,7 +68,7 @@ tiles map =
             toFloat map.height / toFloat map.tileSize
 
         tile =
-            Tile.fromLatLng (toFloat <| ceiling zoom) center
+            Tile.fromLatLng (toFloat <| ceiling z) center
 
         xTiles =
             List.range (floor <| -xCount / 2) (ceiling <| xCount / 2)
@@ -75,7 +77,7 @@ tiles map =
             List.range (floor <| -yCount / 2) (ceiling <| yCount / 2)
 
         wrapTile =
-            wrap 0 (2 ^ ceiling zoom)
+            wrap 0 (2 ^ ceiling z)
 
         tileCoords t x y =
             { x = floor t.x + x |> wrapTile
@@ -86,7 +88,7 @@ tiles map =
             { url =
                 Tile.url
                     map.server
-                    (ceiling zoom)
+                    (ceiling z)
                     (tileCoords tile x y).x
                     (tileCoords tile x y).y
             , offset =

@@ -12,7 +12,6 @@ import LatLng as LatLng exposing (LatLng, getLat, getLng)
 import Regex exposing (replace)
 import Utils exposing (uncurry, wrap)
 
-
 type alias Url =
     String
 

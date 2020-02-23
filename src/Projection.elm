@@ -46,11 +46,11 @@ unproject tileSize zoom { x, y } =
         scale =
             toFloat tileSize * (2 ^ zoom)
 
-        py =
-            (y / scale - 0.5) / s
-
         px =
-            (x / scale - 0.5) / -s
+            (x / scale - 0.5) / s
+
+        py =
+            (y / scale - 0.5) / -s
     in
     latLng
         { lat = (2 * atan (e ^ (py / r)) - (pi / 2)) * d
@@ -87,10 +87,10 @@ tileToLatLng { x, y } zoom =
     in
     latLng { lat = lat_deg, lng = lon_deg }
 
-
+-- https://developers.google.com/maps/documentation/javascript/coordinates#world-coordinates
 pixelToLatLng : Int -> Float -> Offset -> LatLng
-pixelToLatLng tileSize zoom { x, y } =
-    unproject tileSize zoom { x = x * toFloat tileSize, y = y * toFloat tileSize }
+pixelToLatLng tileSize zoom offset =
+    unproject tileSize 0 <| pixelToWorld zoom offset
 
 
 metersPixels : Float -> Zoom -> Offset -> Offset

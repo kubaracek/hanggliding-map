@@ -5,6 +5,7 @@ import Browser.Events exposing (onAnimationFrameDelta)
 import Canvas exposing (rect, shapes)
 import Canvas.Settings exposing (fill)
 import Canvas.Settings.Advanced exposing (rotate, transform, translate)
+import Canvas.Settings.Text exposing (..)
 import Canvas.Texture as Texture exposing (Texture)
 import Color
 import Html exposing (Html, button, div, text)
@@ -12,7 +13,9 @@ import Html.Attributes as Attr exposing (style)
 import Html.Events exposing (onClick)
 import Map
 import Tile
-
+import Projection exposing (pixelToLatLng)
+import LatLng exposing (getLat, getLng)
+import Bounds
 
 type Load a
     = Loading
@@ -32,8 +35,7 @@ type alias TexturedMap =
 
 
 type alias TileData =
-    { offset : Tile.Offset
-    , size : Float
+    { tile : Tile.Tile
     , texture : Texture
     }
 
@@ -54,7 +56,7 @@ type MapType =
   | ImageMap
 
 type Msg
-    = TextureLoaded Float MapType Tile.Offset (Maybe Texture)
+    = TextureLoaded MapType Tile.Tile (Maybe Texture)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -75,13 +77,13 @@ update msg model =
                         |> asImageMapIn model
     in
     case msg of
-        TextureLoaded _ maptype _ Nothing ->
+        TextureLoaded maptype _ Nothing ->
             ( updateTexture Failure maptype
             , Cmd.none
             )
 
-        TextureLoaded size maptype offset (Just texture) ->
-            ( updateTexture (Success { offset = offset, texture = texture, size = size }) maptype
+        TextureLoaded maptype tile (Just texture) ->
+            ( updateTexture (Success { tile = tile, texture = texture }) maptype
             , Cmd.none
             )
 
@@ -115,7 +117,7 @@ view model =
     { title = "Hanggliding Map"
     , body =
         [ viewCanvas "imageMap" ImageMap model.imageMap
-        , viewCanvas "heightMap" HeightMap model.heightMap
+        -- , viewCanvas "heightMap" HeightMap model.heightMap
         , text <| Maybe.withDefault "Unknown" (Maybe.map String.fromFloat <| List.minimum (List.map (\ t -> t.offset.x) <| Map.tiles model.imageMap.map))
         ]
     }
@@ -127,8 +129,9 @@ viewCanvas id maptype model =
         clear =
             shapes [ fill Color.white ] [ rect ( 0, 0 ) (toFloat model.map.width) (toFloat model.map.height) ]
 
+        load : Tile.Tile -> Texture.Source Msg
         load tile =
-            Texture.loadFromImageUrl tile.url (TextureLoaded (toFloat model.map.tileSize)  maptype tile.offset)
+            Texture.loadFromImageUrl tile.url (TextureLoaded maptype tile)
 
         renderTile tex =
             case tex of
@@ -136,15 +139,27 @@ viewCanvas id maptype model =
                     [Canvas.text [] ( 0, 0 ) "Loading"]
 
                 Success tt ->
-                    [ Canvas.texture [] ( tt.offset.x, tt.offset.y ) tt.texture
+                    let
+                        latlng t = pixelToLatLng model.map.tileSize (Map.zoom model.map) <|
+                                 { x = (toFloat t.coordinates.x * toFloat model.map.tileSize) - offset.x
+                                 , y = (toFloat t.coordinates.y * toFloat model.map.tileSize) - offset.y
+                                 }
+                        calibrationText t = "Lat: " ++ (String.fromFloat <| getLat <| latlng t) ++  ", Lng: " ++ (String.fromFloat <| getLng <| latlng t)
+                        offset = tt.tile.offset
+                        size = toFloat tt.tile.size
+                        _ = Debug.log "tile" tt.tile
+                    in
+                    [ Canvas.texture [] ( offset.x, offset.y ) tt.texture
                     --
                     -- Calibration
                     --
-                    , Canvas.text [] ( tt.offset.x - 2, tt.offset.y - 2 ) "hello"
-                    , shapes [ fill Color.red ] [ rect ( tt.offset.x - 2, tt.offset.y - 2 ) 4 4 ]
-                    , shapes [ fill Color.red ] [ rect ( tt.offset.x - 2 + tt.size, tt.offset.y - 2 ) 4 4 ]
-                    , shapes [ fill Color.red ] [ rect ( tt.offset.x - 2, tt.offset.y - 2 + tt.size ) 4 4 ]
-                    , shapes [ fill Color.red ] [ rect ( tt.offset.x - 2 + tt.size, tt.offset.y - 2 + tt.size ) 4 4 ]
+                    , Canvas.text [] (0,0) ""
+                    , Canvas.text [font { size = 10, family = "sans-serif" }] ( offset.x, offset.y + 10 ) <| "lat: " ++ (String.fromFloat <| getLat <| latlng tt.tile)
+                    , Canvas.text [font { size = 10, family = "sans-serif" }] ( offset.x, offset.y + 20 ) <| "lng: " ++ (String.fromFloat <| getLng <| latlng tt.tile)
+                    , shapes [ fill Color.red ] [ rect ( offset.x - 2, offset.y - 2 ) 4 4 ]
+                    , shapes [ fill Color.red ] [ rect ( offset.x - 2 + size, offset.y - 2 ) 4 4 ]
+                    , shapes [ fill Color.red ] [ rect ( offset.x - 2, offset.y - 2 + size ) 4 4 ]
+                    , shapes [ fill Color.red ] [ rect ( offset.x - 2 + size, offset.y - 2 + size ) 4 4 ]
                     ]
 
                 Failure ->
@@ -160,6 +175,6 @@ viewCanvas id maptype model =
         [ Attr.id id
         , Attr.hidden False
         , Attr.style "position" "absolute"
-        , Attr.style "opacity" "0.5"
+        , Attr.style "opacity" "1"
         , Attr.style "background-color" "red"
         ] (clear :: List.concatMap renderTile model.textures)
