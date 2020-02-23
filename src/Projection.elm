@@ -27,8 +27,27 @@ latLngMeters latlng =
         my =
             my_ * originShift / 180.0
     in
-    { x = mx, y = my }
+        { x = mx, y = my }
 
+unproject : Int -> Zoom -> Offset -> LatLng
+unproject tileSize zoom {x, y} =
+    let
+        -- https://observablehq.com/@kjerandp/unprojecting-map-tile-coordinates
+        r = 6378137
+        d = 180 / pi
+        s = 0.5 / (pi * r)
+        scale = toFloat tileSize * (2 ^ zoom)
+        py = (x / scale - 0.5) / s
+        px = (y / scale - 0.5) / -s
+    in
+        latLng
+          { lat = (2 * atan(e ^ (py / r)) - (pi / 2)) * d
+          , lng = px * d / r
+          }
+
+pixelToLatLng : Int -> Float -> Offset -> LatLng
+pixelToLatLng tileSize zoom {x, y} =
+  unproject tileSize zoom {x = (x * toFloat tileSize), y = (y * toFloat tileSize)}
 
 metersPixels : Float -> Zoom -> Offset -> Offset
 metersPixels tileSize zoom { x, y } =
