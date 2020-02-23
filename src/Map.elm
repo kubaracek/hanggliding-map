@@ -1,6 +1,6 @@
 module Map exposing (..)
 
-import Bounds exposing (Bounds, Zoom)
+import Bounds exposing (Bounds(..), Zoom)
 import LatLng exposing (LatLng, latLng)
 import Tile exposing (Tile)
 import Utils exposing (cartesianMap, wrap)
@@ -28,14 +28,21 @@ exampleHeightMap =
 exampleTexturedMap =
     { server = "https://api.maptiler.com/maps/topo/256/{z}/{x}/{y}.png?key=uOnJe75yrTX7TmDr3V5B"
     , bounds =
-        { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
-        , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
-        }
+        -- Bounds { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
+        -- , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
+        -- }
+        Centered { center = latLng { lat = 47.347858, lng = 11.707069 }, zoom = 11 }
     , width = 1024
     , height = 1024
     , tileSize = 256
     }
 
+scaleFactor : Map -> Float
+scaleFactor map =
+    let
+        zoom = Bounds.zoom (toFloat map.tileSize) (toFloat map.width) (toFloat map.height) map.bounds
+    in
+        1 + zoom - (toFloat <| floor zoom)
 
 tiles : Map -> List Tile
 tiles map =

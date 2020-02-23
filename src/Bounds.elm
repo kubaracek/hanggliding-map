@@ -1,5 +1,5 @@
 module Bounds exposing
-    ( Bounds
+    ( Bounds(..)
     , Zoom
     , findCenter
     , zoom
