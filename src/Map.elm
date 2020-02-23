@@ -15,11 +15,12 @@ type alias Map =
     }
 
 exampleHeightMap =
-    { server = "https://s3.amazonaws.com/elevation-tiles-prod/normal/{z}/{x}/{y}.png"
+    { server = "https://tile.nextzen.org/tilezen/terrain/v1/256/normal/{z}/{x}/{y}.png?api_key=XJJmLW0zTjKgdFUvWgLV7Q"
     , bounds =
-        { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
-        , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
-        }
+        -- Bounds { northEast = latLng { lat = 47.46453992268503, lng = 11.716575622558594 }
+        -- , southWest = latLng { lat = 47.253135632244216, lng = 11.376686096191406 }
+        -- }
+        Centered { center = latLng { lat = 47.347858, lng = 11.707069 }, zoom = 11 }
     , width = 1024
     , height = 1024
     , tileSize = 256

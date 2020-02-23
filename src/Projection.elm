@@ -1,9 +1,10 @@
-module Projection exposing (boundsPixelOffset)
+module Projection exposing (..)
 
 import Bounds exposing (Bounds, Zoom)
-import LatLng exposing (LatLng, getLat, getLng)
+import LatLng exposing (LatLng, getLat, getLng, latLng)
 import Tile exposing (Offset)
 import Utils exposing (flip)
+import Map
 
 
 initialResolution tileSize =
@@ -42,17 +43,6 @@ metersPixels tileSize zoom { x, y } =
             (y + originShift) / res |> round
     in
     { x = toFloat px, y = toFloat py }
-
-
-boundsPixelOffset : Float -> Float -> Bounds LatLng -> Bounds Offset
-boundsPixelOffset tileSize zoom { northEast, southWest } =
-    let
-        pix latlng =
-            metersPixels tileSize zoom <| latLngMeters latlng
-    in
-    { northEast = pix northEast
-    , southWest = pix southWest
-    }
 
 
 resolution : Float -> Zoom -> Float
