@@ -141,8 +141,8 @@ viewCanvas id maptype model =
                 Success tt ->
                     let
                         latlng t = pixelToLatLng model.map.tileSize (Map.zoom model.map) <|
-                                 { x = ((toFloat t.coordinates.x) * toFloat model.map.tileSize) + offset.x
-                                 , y = ((toFloat t.coordinates.y) * toFloat model.map.tileSize) + offset.y
+                                 { x = ((toFloat t.coordinates.x) * toFloat model.map.tileSize)
+                                 , y = ((toFloat t.coordinates.y) * toFloat model.map.tileSize)
                                  }
                         calibrationText t = "Lat: " ++ (String.fromFloat <| getLat <| latlng t) ++  ", Lng: " ++ (String.fromFloat <| getLng <| latlng t)
                         offset = tt.tile.offset
@@ -156,6 +156,7 @@ viewCanvas id maptype model =
                     , Canvas.text [] (0,0) ""
                     , Canvas.text [font { size = 10, family = "sans-serif" }] ( offset.x, offset.y + 10 ) <| "lat: " ++ (String.fromFloat <| getLat <| latlng tt.tile)
                     , Canvas.text [font { size = 10, family = "sans-serif" }] ( offset.x, offset.y + 20 ) <| "lng: " ++ (String.fromFloat <| getLng <| latlng tt.tile)
+                    , shapes [ fill Color.green ] [ rect ( offset.x + 128 - 2, offset.y + 128 - 2 ) 4 4 ]
                     , shapes [ fill Color.red ] [ rect ( offset.x - 2, offset.y - 2 ) 4 4 ]
                     , shapes [ fill Color.red ] [ rect ( offset.x - 2 + size, offset.y - 2 ) 4 4 ]
                     , shapes [ fill Color.red ] [ rect ( offset.x - 2, offset.y - 2 + size ) 4 4 ]

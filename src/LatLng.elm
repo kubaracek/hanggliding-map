@@ -1,4 +1,13 @@
-module LatLng exposing (GPS(..), LatLng, fromGps, getLat, getLng, latLng)
+module LatLng exposing
+    ( GPS(..)
+    , LatLng
+    , bearingTo
+    , distanceBetween
+    , fromGps
+    , getLat
+    , getLng
+    , latLng
+    )
 
 
 type LatLng
@@ -68,3 +77,52 @@ getLng latlng =
 
         Gps l ->
             decGps l.lng
+
+
+{-| Calculate the distance in kilometers between two points.
+Note that this assumes the earth is spherical, which is not true, but may be true enough for your purposes.
+-}
+distanceBetween : LatLng -> LatLng -> Float
+distanceBetween a b =
+    let
+        earthRadius =
+            6371
+
+        dlat =
+            degrees (getLat b - getLat a)
+
+        dlng =
+            degrees (getLng b - getLng a)
+
+        v1 =
+            sin (dlat / 2)
+                * sin (dlat / 2)
+                + cos (degrees <| getLat a)
+                * cos (degrees <| getLat b)
+                * sin (dlng / 2)
+                * sin (dlng / 2)
+
+        v2 =
+            2 * atan2 (sqrt v1) (sqrt (1 - v1))
+    in
+    earthRadius * v2
+
+
+{-| Calculate the heading you'd need to travel on to get from point a to point b.
+-}
+bearingTo : LatLng -> LatLng -> Float
+bearingTo a b =
+    let
+        dlon =
+            degrees (getLng b) - degrees (getLng a)
+
+        y =
+            sin dlon * cos (degrees <| getLat b)
+
+        x =
+            (cos (degrees <| getLat a) * sin (degrees <| getLat b)) - (sin (degrees <| getLat a) * cos (degrees <| getLat b) * cos dlon)
+
+        bearing =
+            atan2 y x * (180 / pi)
+    in
+    bearing

@@ -2,6 +2,8 @@ module Map exposing (..)
 
 import Bounds exposing (Bounds(..), Zoom)
 import LatLng exposing (LatLng, latLng)
+import Maybe
+import Projection exposing (pixelToLatLng)
 import Tile exposing (Tile)
 import Utils exposing (cartesianMap, wrap)
 
@@ -28,6 +30,7 @@ exampleHeightMap =
     }
 
 
+
 exampleTexturedMap =
     { server = "https://api.maptiler.com/maps/topo/256/{z}/{x}/{y}.png?key=uOnJe75yrTX7TmDr3V5B"
     , bounds =
@@ -44,9 +47,10 @@ exampleTexturedMap =
 scaleFactor : Map -> Float
 scaleFactor map =
     let
-        z = zoom map
+        z =
+            zoom map
     in
-        1 + z - (toFloat <| floor z)
+    1 + z - (toFloat <| floor z)
 
 
 zoom : Map -> Zoom
@@ -57,7 +61,9 @@ zoom map =
 tiles : Map -> List Tile
 tiles map =
     let
-        z = zoom map
+        z =
+            zoom map
+
         center =
             Bounds.findCenter map.bounds
 
@@ -110,3 +116,41 @@ setHeight res map =
 setWidth : Int -> Map -> Map
 setWidth res map =
     { map | width = res }
+
+
+
+---- GEO STUFF
+----
+-- Get visible's map bounds lat/lng
+-- (what user sees)
+getVisibleBounds : Map -> Bounds LatLng
+getVisibleBounds map =
+    let
+        firstTile =
+            List.head <| tiles map
+
+        -- Get's coordinates of the first pixel that user sees (top-left)
+        firstTileScreenPixelCord =
+            case firstTile of
+                Just tile ->
+                    { x = toFloat (tile.coordinates.x * map.tileSize) - tile.offset.x
+                    , y = toFloat (tile.coordinates.y * map.tileSize) - tile.offset.y
+                    }
+
+                Nothing ->
+                    { x = 0, y = 0 }
+
+        screenSwPixel =
+            { x = firstTileScreenPixelCord.x
+            , y = firstTileScreenPixelCord.y + toFloat map.height
+            }
+
+        screenNePixel =
+            { x = firstTileScreenPixelCord.x + toFloat map.width
+            , y = firstTileScreenPixelCord.y
+            }
+    in
+    Bounds
+        { northEast = pixelToLatLng map.tileSize (zoom map) screenNePixel
+        , southWest = pixelToLatLng map.tileSize (zoom map) screenSwPixel
+        }
